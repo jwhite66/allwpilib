@@ -10,6 +10,7 @@
 #include "ErrorsInternal.h"
 #include "HAL/DriverStation.h"
 #include "HAL/Errors.h"
+#include "HAL/Extensions.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "MockData/RoboRioDataInternal.h"
 #include "MockHooksInternal.h"
@@ -194,6 +195,7 @@ HAL_Bool HAL_GetBrownedOut(int32_t* status) {
 }
 
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
+  if (HAL_LoadExtensions() < 0) return false;
   hal::RestartTiming();
   HAL_InitializeDriverStation();
   return true;  // Add initialization if we need to at a later point
