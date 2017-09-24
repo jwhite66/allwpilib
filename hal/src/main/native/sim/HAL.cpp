@@ -7,6 +7,12 @@
 
 #include "HAL/HAL.h"
 
+#if defined(WIN32) || defined(_WIN32)
+#include <windows.h>
+#else
+#include <dlfcn.h>
+#endif
+
 #include "ErrorsInternal.h"
 #include "HAL/DriverStation.h"
 #include "HAL/Errors.h"
@@ -193,7 +199,43 @@ HAL_Bool HAL_GetBrownedOut(int32_t* status) {
   return false;  // Figure out if we need to detect a brownout condition
 }
 
+/* A return < 0 indicates an error that should stop the HAL.
+   0 is success, and > 0 is a non fatal error */
+typedef int halsim_init_func_t(void);
+
+int HAL_LoadExtraSimulation(const char* library) {
+  int rc = 1;  // It is expected and reasonable not to find an extra simulation
+#if defined(WIN32) || defined(_WIN32)
+  std::string library_name = std::string(library) + ".dll";
+  HMODULE handle = LoadLibrary(library_name.c_str());
+#else
+  std::string library_name = "lib" + std::string(library) + ".so";
+  void *handle = dlopen(library_name.c_str(), RTLD_LAZY);
+#endif
+  if (!handle) return rc;
+
+  halsim_init_func_t* init;
+#if defined(WIN32) || defined(_WIN32)
+  init = reinterpret_cast<halsim_init_func_t*>(GetProcAddress(handle, "init"));
+ #else
+  init = reinterpret_cast<halsim_init_func_t*>(dlsym(handle, "init"));
+#endif
+
+  if (init) {
+    rc = (*init)();
+  }
+#if defined(WIN32) || defined(_WIN32)
+  FreeLibrary(handle);
+ #else
+  dlclose(handle);
+#endif
+  return rc;
+}
+
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
+#if !defined(WIN32) && !defined(_WIN32)
+  if (HAL_LoadExtraSimulation("halsim_gazebo") < 0) return false;
+#endif
   hal::RestartTiming();
   HAL_InitializeDriverStation();
   return true;  // Add initialization if we need to at a later point
