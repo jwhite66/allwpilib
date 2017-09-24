@@ -108,6 +108,10 @@ model {
                         }
                     }
                 }
+                // TODO - this is clearly wrong for Windows
+                binaries.all {
+                    linker.args "-ldl"
+                }
             }
             if (project.hasProperty('buildHalStaticDeps')) {
                 halSimStaticDeps(NativeLibrarySpec) {
