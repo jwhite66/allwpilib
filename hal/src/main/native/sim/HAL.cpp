@@ -7,6 +7,8 @@
 
 #include "HAL/HAL.h"
 
+#include <dlfcn.h>
+
 #include "ErrorsInternal.h"
 #include "HAL/DriverStation.h"
 #include "HAL/Errors.h"
@@ -193,7 +195,29 @@ HAL_Bool HAL_GetBrownedOut(int32_t* status) {
   return false;  // Figure out if we need to detect a brownout condition
 }
 
+/* A return < 0 indicates an error that should stop the HAL.
+   0 is success, and > 0 is a non fatal error */
+typedef int halsim_init_func_t(void);
+
+/* TODO: This should be #ifdefed to protect Windows, and perhaps have a
+ * LoadLibrary variant */
+int HAL_LoadExtraSimulation(const char* library) {
+  void* handle;
+  int rc = 1;  // It is expected and reasonable not to find an extra simulation
+  halsim_init_func_t* init;
+  handle = dlopen(library, RTLD_LAZY);
+  if (!handle) return rc;
+
+  init = reinterpret_cast<halsim_init_func_t*>(dlsym(handle, "init"));
+  if (init) {
+    rc = (*init)();
+  }
+  dlclose(handle);
+  return rc;
+}
+
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
+  if (HAL_LoadExtraSimulation("libhalsim_gazebo.so") < 0) return false;
   hal::RestartTiming();
   HAL_InitializeDriverStation();
   return true;  // Add initialization if we need to at a later point
