@@ -5,6 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "HAL/DriverStation.h"
+
 #include <atomic>
 #include <chrono>
 #include <cstdlib>
@@ -14,7 +16,6 @@
 #include <FRC_NetworkCommunication/FRCComm.h>
 #include <llvm/raw_ostream.h>
 
-#include "HAL/DriverStation.h"
 #include "HAL/cpp/priority_condition_variable.h"
 #include "HAL/cpp/priority_mutex.h"
 
