@@ -12,7 +12,7 @@ ext.addHalCompilerArguments = { binary->
         }
     }
     tasks.withType(CppCompile) {
-        binary.cppCompiler.args "-DNAMESPACED_PRIORITY"
+        binary.cppCompiler.args "-DNAMESPACED_PRIORITY", "-I/home/jwhite/w/allwpilib/ni-libraries/include"
     }
 }
 
