@@ -5,6 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "HAL/DriverStation.h"
+
 #include <atomic>
 #include <chrono>
 #include <cstdlib>
@@ -16,8 +18,6 @@
 #include <llvm/raw_ostream.h>
 #include <support/condition_variable.h>
 #include <support/mutex.h>
-
-#include "HAL/DriverStation.h"
 
 static_assert(sizeof(int32_t) >= sizeof(int),
               "FRC_NetworkComm status variable is larger than 32 bits");

@@ -32,7 +32,6 @@ void InitializeHAL() {
   InitializeCanData();
   InitializeDigitalPWMData();
   InitializeDIOData();
-  InitializeDriverStationData();
   InitializeEncoderData();
   InitializeI2CData();
   InitializePCMData();
@@ -54,7 +53,6 @@ void InitializeHAL() {
   InitializeCounter();
   InitializeDigitalInternal();
   InitializeDIO();
-  InitializeDriverStation();
   InitializeEncoder();
   InitializeExtensions();
   InitializeI2C();
