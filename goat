@@ -1,0 +1,10 @@
+#!/bin/bash
+
+pushd `dirname $0` >/dev/null
+top=`pwd`
+popd >/dev/null
+
+export LD_LIBRARY_PATH=$top/wpilibc/build/install/wpilibcTestingBaseTest/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$top/simulation/halsim_gazebo/build/libs/halsim_gazebo/shared:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$top/hal/build/libs/halSim/shared:$LD_LIBRARY_PATH
+$top/PacGoat/build/exe/fRCUserProgram/FRCUserProgram
