@@ -49,6 +49,8 @@ model {
             linker.args gazebo_linker_args
             cppCompiler.args gazebo_cppflags
             lib project: ":simulation:gz_msgs", library: "gz_msgs", linkage: "static"
+            project(':hal').addHalCompilerArguments(it)
+            project(':hal').addHalToLinker(it)
         }
     }
 }
