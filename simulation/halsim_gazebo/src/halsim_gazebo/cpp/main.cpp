@@ -7,22 +7,27 @@
 
 #include <iostream>
 
-#include <GazeboNode.h>
+#include "GazeboPWM.h"
+#include "HALSimGazebo.h"
 
 /* Currently, robots never terminate, so we keep a single static object
    to access Gazebo with and it is never properly released or cleaned up. */
-static GazeboNode node;
+static HALSimGazebo halsim;
 
 extern "C" {
 int init(void) {
   std::cout << "Gazebo Simulator Initializing." << std::endl;
 
-  if (!node.Connect()) {
+  if (!halsim.node.Connect()) {
     std::cerr << "Error: unable to connect to Gazebo.  Is it running?."
               << std::endl;
     return -1;
   }
   std::cout << "Gazebo Simulator Connected." << std::endl;
+
+  for (int i = 0; i < HALSimGazebo::kPWMCount; i++)
+    halsim.pwms[i] = new GazeboPWM(i, &halsim);
+
   return 0;
 }
-}
+}  // extern "C"
