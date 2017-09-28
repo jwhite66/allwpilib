@@ -16,34 +16,35 @@
 /**
  * \brief Plugin for controlling a joint with a pneumatic piston.
  *
- * This plugin subscribes to a topic to get a signal. It accepts three
- * values:
- *
- * -  1: Apply the forward force to the joint.
- * -  0: Maintain last applied force
- * - -1: Apply the reverse force to the joint.
+ * This plugin subscribes to topics to get the solenoid state for a piston
+ *    It needs one signal for the forward signal.  For a double solenoid,
+ *    a second signal can be sent.
+ *    Each signal is a boolean.
  *
  * Every physics update the joint's torque is set to reflect the
- * signal.
+ * signal, using the configured force
  *
  * To add a pneumatic piston to your robot, add the following XML to
  * your robot model:
  *
  *     <plugin name="my_piston" filename="libpneumatic_piston.so">
  *       <joint>Joint Name</joint>
- *       <topic>~/my/topic</topic>
+ *       <topic>~/pneumatics/1/1</topic>
+ *       <reverse-topic>~/pneumatics/1/2</reverse-topic>
  *       <direction>{forward, reversed}</direction>
  *       <forward-force>Number</forward-force>
  *       <reverse-force>Number</reverse-force>
  *     </plugin>
  *
- * - `joint`: Name of the joint this Dc motor is attached to.
- * - `topic`: Optional. Message type should be gazebo.msgs.Float64.
+ * - `joint`: Name of the joint this piston is attached to.
+ * - `topic`: Optional. Forward Solenoid signal type should be gazebo.msgs.Bool.
+ * - `topic-reverse`: Optional. Message type should be gazebo.msgs.Bool.
  * - `direction`: Optional. Defaults to forward. Reversed if the
  *                piston pushes in the opposite direction of the joint
  *                axis.
  * - `forward-force`: Force to apply in the forward direction.
  * - `reverse-force`: Force to apply in the reverse direction.
+ *                    Used only if a reverse-topic is given
  *
  * \todo Signal should probably be made a tri-state message.
  */
@@ -56,11 +57,17 @@ class PneumaticPiston : public gazebo::ModelPlugin {
   void Update(const gazebo::common::UpdateInfo& info);
 
  private:
-  /// \brief Topic to read control signal from.
+  /// \brief Topic to read forward control signal from.
   std::string topic;
 
-  /// \brief The signal is one of: {-1,0,1}.
-  double signal;
+  /// \brief Topic to read reverse control signal from.
+  std::string reverse_topic;
+
+  /// \brief Whether the solenoid to open forward is on
+  bool forward_signal;
+
+  /// \brief Whether the solenoid to open in reverse is on
+  bool reverse_signal;
 
   /// \brief The magic force multipliers for each direction.
   double forward_force, reverse_force;
@@ -68,8 +75,11 @@ class PneumaticPiston : public gazebo::ModelPlugin {
   /// \brief The joint that this pneumatic piston actuates.
   gazebo::physics::JointPtr joint;
 
-  /// \brief Callback for receiving msgs and updating the torque.
-  void Callback(const gazebo::msgs::ConstFloat64Ptr& msg);
+  /// \brief Callback for receiving msgs and updating the solenoid state
+  void ForwardCallback(const gazebo::msgs::ConstBoolPtr& msg);
+
+  /// \brief Callback for receiving msgs and updating the reverse solenoid state
+  void ReverseCallback(const gazebo::msgs::ConstBoolPtr& msg);
 
   /// \brief The model to which this is attached.
   gazebo::physics::ModelPtr model;
@@ -82,4 +92,7 @@ class PneumaticPiston : public gazebo::ModelPlugin {
 
   /// \brief Subscriber handle.
   gazebo::transport::SubscriberPtr sub;
+
+  /// \brief Subscriber handle for reverse topic
+  gazebo::transport::SubscriberPtr sub_reverse;
 };
