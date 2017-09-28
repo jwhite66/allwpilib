@@ -7,17 +7,20 @@
 
 #pragma once
 
-#include "GazeboNode.h"
+#include "HALSimGazebo.h"
 
-class GazeboPWM;
-class GazeboPCM;
-
-class HALSimGazebo {
+class GazeboPCM {
  public:
-  static const int kPWMCount = 20;
-  static const int kPCMCount = 8;
+  GazeboPCM(int index, int channel, HALSimGazebo* halsim);
+  void Publish(bool value);
 
-  GazeboNode node;
-  GazeboPWM* pwms[kPWMCount];
-  GazeboPCM* pcms[kPCMCount];
+ private:
+  HALSimGazebo* m_halsim;
+
+  int m_index;
+  int m_channel;
+
+  gazebo::transport::PublisherPtr m_pub;
 };
+
+void GazeboPCM_SetPressureSwitch(int index, bool value);
