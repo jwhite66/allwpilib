@@ -13,6 +13,7 @@ using namespace hal;
 
 EncoderData hal::SimEncoderData[kNumEncoders];
 void EncoderData::ResetData() {
+  m_digitalChannelA = 0;
   m_initialized = false;
   m_initializedCallbacks = nullptr;
   m_count = 0;
@@ -30,6 +31,12 @@ void EncoderData::ResetData() {
   m_samplesToAverage = 0;
   m_samplesToAverageCallbacks = nullptr;
 }
+
+void EncoderData::SetDigitalChannelA(int16_t channel) {
+  m_digitalChannelA = channel;
+}
+
+int16_t EncoderData::GetDigitalChannelA() { return m_digitalChannelA; }
 
 int32_t EncoderData::RegisterInitializedCallback(HAL_NotifyCallback callback,
                                                  void* param,
@@ -324,6 +331,10 @@ void EncoderData::SetSamplesToAverage(int32_t samplesToAverage) {
 extern "C" {
 void HALSIM_ResetEncoderData(int32_t index) {
   SimEncoderData[index].ResetData();
+}
+
+int16_t HALSIM_GetDigitalChannelA(int index) {
+  return SimEncoderData[index].GetDigitalChannelA();
 }
 
 int32_t HALSIM_RegisterEncoderInitializedCallback(int32_t index,
