@@ -17,6 +17,9 @@
 namespace hal {
 class EncoderData {
  public:
+  void SetDigitalChannelA(int16_t channel);
+  int16_t GetDigitalChannelA();
+
   int32_t RegisterInitializedCallback(HAL_NotifyCallback callback, void* param,
                                       HAL_Bool initialNotify);
   void CancelInitializedCallback(int32_t uid);
@@ -77,6 +80,7 @@ class EncoderData {
 
  private:
   std::mutex m_registerMutex;
+  std::atomic<int16_t> m_digitalChannelA{0};
   std::atomic<HAL_Bool> m_initialized{false};
   std::shared_ptr<NotifyListenerVector> m_initializedCallbacks = nullptr;
   std::atomic<int32_t> m_count{0};
