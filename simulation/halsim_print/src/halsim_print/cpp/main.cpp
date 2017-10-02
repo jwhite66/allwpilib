@@ -15,6 +15,9 @@
 static HALSimPrint halsim;
 
 extern "C" {
+#if defined(WIN32) || defined(_WIN32)
+__declspec(dllexport)
+#endif
 int init(void) {
   std::cout << "Print Simulator Initializing." << std::endl;
 
