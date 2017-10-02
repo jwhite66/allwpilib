@@ -9,6 +9,9 @@
 **  This file reimplements enough of the FRC_Network layer to enable the
 **    simulator to communicate with a driver station.  That includes a
 **    simple udp layer for communication.
+**  The protocol does not appear to be well documented; this implementation
+**    is based in part on the Toast ds_comms.cpp by Jaci and in part
+**    by the protocol specification given by QDriverStation.
 **--------------------------------------------------------------------------*/
 
 #include <sys/types.h>
@@ -67,7 +70,7 @@ class DriverStationPacket {
     static const uint8_t cFMS_Attached = 0x08;
     static const uint8_t cEmergencyStop = 0x80;
 
-    static const uint8_t cRequestNormal = 0x80;
+    static const uint8_t cRequestNormalMask = 0xF0;
 
     std::memset(&control_word, 0, sizeof(control_word));
     control_word.enabled = (control & cEnabled) != 0;
@@ -75,7 +78,7 @@ class DriverStationPacket {
     control_word.test = (control & cTest) != 0;
     control_word.eStop = (control & cEmergencyStop) != 0;
     control_word.fmsAttached = (control & cFMS_Attached) != 0;
-    control_word.dsAttached = (request == cRequestNormal) != 0;
+    control_word.dsAttached = (request & cRequestNormalMask) != 0;
 
     control_sent = control;
   }
@@ -211,6 +214,17 @@ static int open_listen_socket(int port, bool tcp) {
   return s;
 }
 
+static int decode_ds_tcp_packet(uint8_t* packet, int len) {
+  if (len < 2) return 0;
+  if (packet[0] == 0 && packet[1] == 0) return 2;
+
+  // TODO - implement decode...
+  std::cerr << "Received TCP packet type " << static_cast<int>(packet[2])
+            << "; not handled yet" << std::endl;
+  if (occurFunc_callback) (*occurFunc_callback)(given_refnum);
+  return len;
+}
+
 static void decode_ds_udp_packet(uint8_t* packet, int len) {
   if (len < 3) return;
 
@@ -228,7 +242,7 @@ static void decode_ds_udp_packet(uint8_t* packet, int len) {
         int packet_len = *packet++;
         if (packet_len > len) break;
         if (*packet == cTagJoystick) {
-          if (last_ds_packet.AddJoystick(packet + 1, packet_len - 2) < 0) break;
+          if (last_ds_packet.AddJoystick(packet + 1, packet_len - 1) < 0) break;
         }
         packet += (packet_len - 1);
         len -= packet_len;
@@ -272,6 +286,48 @@ static void send_reply_packet(int socket, struct sockaddr* addr, int addrlen,
 #endif
 }
 
+static void tcp_thread_func() {
+  while (true) {
+    int socket = open_listen_socket(1740, true);
+    if (socket < 0) {
+#if defined(WIN32) || defined(_WIN32)
+      Sleep(1000);
+#else
+      sleep(1);
+#endif
+      continue;
+    }
+    while (true) {
+      int client = accept(socket, NULL, 0);
+      if (client < 0) {
+        close(socket);
+        break;
+      }
+
+      uint8_t buf[8192];
+      int len = 0;
+      do {
+        int rc = read(client, buf + len, sizeof(buf) - len);
+        if (rc <= 0) break;
+        len += rc;
+        int deduct = decode_ds_tcp_packet(buf, len);
+        if (deduct > 0) {
+          std::memmove(buf, buf + deduct, len - deduct);
+          len -= deduct;
+        }
+      } while (true);
+
+#if defined(WIN32) || defined(_WIN32)
+      closesocket(client);
+      Sleep(1000);
+#else
+      close(client);
+      sleep(1);
+#endif
+    }
+  }
+}
+
 static void udp_thread_func() {
   while (true) {
     int socket = open_listen_socket(1110, false);
@@ -307,9 +363,13 @@ static void udp_thread_func() {
 }
 
 static std::thread udp_thread;
+static std::thread tcp_thread;
 static void start() {
   udp_thread = std::thread(udp_thread_func);
   udp_thread.detach();
+
+  tcp_thread = std::thread(tcp_thread_func);
+  tcp_thread.detach();
 }
 
 /*----------------------------------------------------------------------------
