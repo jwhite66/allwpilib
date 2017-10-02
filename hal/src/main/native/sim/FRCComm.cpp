@@ -300,14 +300,19 @@ static void tcp_thread_func() {
     while (true) {
       int client = accept(socket, NULL, 0);
       if (client < 0) {
+#if defined(WIN32) || defined(_WIN32)
+        closesocket(socket);
+#else
         close(socket);
+#endif
         break;
       }
 
       uint8_t buf[8192];
       int len = 0;
       do {
-        int rc = read(client, buf + len, sizeof(buf) - len);
+        int rc = recv(client, reinterpret_cast<char *>(buf + len),
+                      sizeof(buf) - len, 0);
         if (rc <= 0) break;
         len += rc;
         int deduct = decode_ds_tcp_packet(buf, len);
