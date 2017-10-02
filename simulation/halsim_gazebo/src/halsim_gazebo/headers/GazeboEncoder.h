@@ -7,20 +7,22 @@
 
 #pragma once
 
-#include "GazeboNode.h"
+#include "HALSimGazebo.h"
+#include "simulation/gz_msgs/msgs.h"
 
-class GazeboPWM;
-class GazeboPCM;
-class GazeboEncoder;
-
-class HALSimGazebo {
+class GazeboEncoder {
  public:
-  static const int kPWMCount = 20;
-  static const int kPCMCount = 8;
-  static const int kEncoderCount = 8;
+  GazeboEncoder(int index, HALSimGazebo* halsim);
+  void Control(const char* command);
+  void Listen(void);
+  bool m_reverse;
 
-  GazeboNode node;
-  GazeboPWM* pwms[kPWMCount];
-  GazeboPCM* pcms[kPCMCount];
-  GazeboEncoder* encoders[kEncoderCount];
+ private:
+  HALSimGazebo* m_halsim;
+  int m_index;
+
+  void Callback(const gazebo::msgs::ConstFloat64Ptr& msg);
+
+  gazebo::transport::PublisherPtr m_pub;
+  gazebo::transport::SubscriberPtr m_sub;
 };
