@@ -232,11 +232,13 @@ int HAL_LoadExtraSimulation(const char* library) {
   if (init) {
     rc = (*init)();
   }
+  if (rc != 0) {
 #if defined(WIN32) || defined(_WIN32)
-  FreeLibrary(handle);
+    FreeLibrary(handle);
 #else
-  dlclose(handle);
+    dlclose(handle);
 #endif
+  }
   return rc;
 }
 
