@@ -41,6 +41,11 @@
  * (gazebo.msgs.Float64),
  *            `topic`/velocity (gazebo.msgs.Float64), `topic`/control
  * (gazebo.msgs.String)
+ *    The suggested value for topic is of the form
+ *       gazebo/frc/simulator/encoder/dio/<n>
+ *    where <n> is the number of the first digital input channel
+ *    used to formulate the encoder
+ *
  * - `units`: Optional. Defaults to radians.
  */
 class Encoder : public gazebo::ModelPlugin {
