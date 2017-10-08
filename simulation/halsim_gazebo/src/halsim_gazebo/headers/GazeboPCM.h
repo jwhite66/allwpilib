@@ -13,12 +13,15 @@ class GazeboPCM {
  public:
   GazeboPCM(int index, int channel, HALSimGazebo* halsim);
   void Publish(bool value);
+  void SetInitialized(bool value) { m_initialized = value; }
+  bool IsInitialized(void) { return m_initialized; }
 
  private:
   HALSimGazebo* m_halsim;
-
   int m_index;
   int m_channel;
+
+  bool m_initialized;
 
   gazebo::transport::PublisherPtr m_pub;
 };
