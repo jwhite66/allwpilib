@@ -12,10 +12,13 @@
 class GazeboPWM {
  public:
   GazeboPWM(int port, HALSimGazebo* halsim);
+  void SetInitialized(bool value) { m_initialized = value; }
+  bool IsInitialized(void) { return m_initialized; }
   void Publish(double value);
 
  private:
   HALSimGazebo* m_halsim;
   gazebo::transport::PublisherPtr m_pub;
+  bool m_initialized;
   int m_port;
 };
