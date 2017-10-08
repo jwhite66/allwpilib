@@ -13,13 +13,17 @@
 class GazeboEncoder {
  public:
   GazeboEncoder(int index, HALSimGazebo* halsim);
+  void SetInitialized(bool value) { m_initialized = value; }
+  bool IsInitialized(void) { return m_initialized; }
+  void SetReverse(bool value) { m_reverse = value; }
   void Control(const char* command);
   void Listen(void);
-  bool m_reverse;
 
  private:
   HALSimGazebo* m_halsim;
   int m_index;
+  bool m_initialized;
+  bool m_reverse;
 
   void Callback(const gazebo::msgs::ConstFloat64Ptr& msg);
 

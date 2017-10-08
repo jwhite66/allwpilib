@@ -16,20 +16,24 @@
 static void encoder_init_callback(const char* name, void* param,
                                   const struct HAL_Value* value) {
   GazeboEncoder* encoder = static_cast<GazeboEncoder*>(param);
-  encoder->Listen();
-  encoder->Control("start");
+  encoder->SetInitialized(value->data.v_boolean);
+  if (encoder->IsInitialized()) {
+    encoder->Control("start");
+    encoder->Listen();
+  }
 }
 
 static void encoder_reset_callback(const char* name, void* param,
                                    const struct HAL_Value* value) {
   GazeboEncoder* encoder = static_cast<GazeboEncoder*>(param);
-  if (value->data.v_boolean) encoder->Control("reset");
+  if (encoder->IsInitialized() && value->data.v_boolean)
+    encoder->Control("reset");
 }
 
 static void encoder_reverse_callback(const char* name, void* param,
                                      const struct HAL_Value* value) {
   GazeboEncoder* encoder = static_cast<GazeboEncoder*>(param);
-  encoder->m_reverse = value->data.v_boolean;
+  if (encoder->IsInitialized()) encoder->SetReverse(value->data.v_boolean);
 }
 
 GazeboEncoder::GazeboEncoder(int index, HALSimGazebo* halsim) {
@@ -38,12 +42,12 @@ GazeboEncoder::GazeboEncoder(int index, HALSimGazebo* halsim) {
   m_reverse = false;
   m_pub = NULL;
   m_sub = NULL;
-  HALSIM_RegisterEncoderResetCallback(index, encoder_reset_callback, this,
-                                      false);
-  HALSIM_RegisterEncoderReverseDirectionCallback(
-      index, encoder_reverse_callback, this, true);
   HALSIM_RegisterEncoderInitializedCallback(index, encoder_init_callback, this,
                                             true);
+  HALSIM_RegisterEncoderResetCallback(index, encoder_reset_callback, this,
+                                      true);
+  HALSIM_RegisterEncoderReverseDirectionCallback(
+      index, encoder_reverse_callback, this, true);
 }
 
 void GazeboEncoder::Control(const char* command) {
