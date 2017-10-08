@@ -39,7 +39,8 @@ void PneumaticPiston::Load(gazebo::physics::ModelPtr model,
   }
 
   forward_force = sdf->Get<double>("forward-force");
-  reverse_force = sdf->Get<double>("reverse-force");
+  if (sdf->HasElement("reverse-force"))
+    reverse_force = -1.0 * sdf->Get<double>("reverse-force");
 
   if (sdf->HasElement("direction") &&
       sdf->Get<std::string>("direction") == "reversed") {
@@ -72,8 +73,17 @@ void PneumaticPiston::Load(gazebo::physics::ModelPtr model,
 
 void PneumaticPiston::Update(const gazebo::common::UpdateInfo& info) {
   double force = 0.0;
-  if (forward_signal) force = forward_force;
-  if (!reverse_topic.empty() && reverse_signal) force = reverse_force;
+  if (forward_signal) {
+    force = forward_force;
+  }
+  else {
+    /* For DoubleSolenoids, the second signal must be present
+       for us to apply the reverse force.  For SingleSolenoids,
+       the lack of the forward signal suffices.
+       Note that a true simulation would not allow a SingleSolenoid to
+       have reverse force, but we put that in the hands of the model builder.*/
+    if (reverse_topic.empty() || reverse_signal) force = reverse_force;
+  }
   joint->SetForce(0, force);
 }
 

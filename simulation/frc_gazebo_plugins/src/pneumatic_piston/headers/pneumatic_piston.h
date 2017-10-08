@@ -37,19 +37,19 @@
  *     </plugin>
  *
  * - `joint`: Name of the joint this piston is attached to.
- * - `topic`: Optional. Forward Solenoid signal type should be gazebo.msgs.Bool.
+ * - `topic`: Optional. Forward Solenoid signal name. type gazebo.msgs.Bool.
  *            If not given, the name given for the plugin will be used.
  *            To match the simulator, a pattern of ~/pneumatics/1/n is good.
  *            The first number represents the PCM module.  Only 1 is supported.
  *            The second number represents the channel on the PCM.
  * - `topic-reverse`: Optional. If given, represents the reverse channel.
  *            Message type should be gazebo.msgs.Bool.
- * - `direction`: Optional. Defaults to forward. Reversed if the
- *                piston pushes in the opposite direction of the joint
- *                axis.
+ * - `direction`: Optional. Defaults to forward. Reversed if the piston
+ *                pushes in the opposite direction of the joint axis.
  * - `forward-force`: Force to apply in the forward direction.
  * - `reverse-force`: Force to apply in the reverse direction.
- *                    Used only if a reverse-topic is given
+ *                    For a single solenoid, you would expect '0',
+ *                    but we allow model builders to provide a value.
  *
  */
 class PneumaticPiston : public gazebo::ModelPlugin {
