@@ -27,9 +27,8 @@ public:
 
 private:
 	frc::Command* autonomousCommand = nullptr;
-	std::unique_ptr<frc::Command> driveAndShootAuto {
-		new DriveAndShootAutonomous() };
-	std::unique_ptr<frc::Command> driveForwardAuto { new DriveForward() };
+	frc::Command* driveAndShootAuto;
+	frc::Command* driveForwardAuto;
 	SendableChooser<frc::Command*> autoChooser;
 
 	void RobotInit() override;

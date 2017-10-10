@@ -4,14 +4,24 @@
 
 #include <SmartDashboard/SmartDashboard.h>
 
-std::shared_ptr<DriveTrain> Robot::drivetrain = std::make_shared<DriveTrain>();
-std::shared_ptr<Pivot> Robot::pivot = std::make_shared<Pivot>();
-std::shared_ptr<Collector> Robot::collector = std::make_shared<Collector>();
-std::shared_ptr<Shooter> Robot::shooter = std::make_shared<Shooter>();
-std::shared_ptr<Pneumatics> Robot::pneumatics = std::make_shared<Pneumatics>();
-std::unique_ptr<OI> Robot::oi = std::make_unique<OI>();
+std::shared_ptr<DriveTrain> Robot::drivetrain;
+std::shared_ptr<Pivot> Robot::pivot;
+std::shared_ptr<Collector> Robot::collector;
+std::shared_ptr<Shooter> Robot::shooter;
+std::shared_ptr<Pneumatics> Robot::pneumatics;
+std::unique_ptr<OI> Robot::oi;
 
 void Robot::RobotInit() {
+        drivetrain = std::make_shared<DriveTrain>();
+        pivot = std::make_shared<Pivot>();
+        collector = std::make_shared<Collector>();
+        shooter = std::make_shared<Shooter>();
+        pneumatics = std::make_shared<Pneumatics>();
+        oi = std::make_unique<OI>();
+
+        driveAndShootAuto = new DriveAndShootAutonomous();
+        driveForwardAuto = new DriveForward();
+
 	// Show what command your subsystem is running on the SmartDashboard
 	frc::SmartDashboard::init();
 	frc::SmartDashboard::PutData(drivetrain.get());
@@ -21,8 +31,8 @@ void Robot::RobotInit() {
 	frc::SmartDashboard::PutData(pneumatics.get());
 
 	// instantiate the command used for the autonomous period
-	autoChooser.AddDefault("Drive and Shoot", driveAndShootAuto.get());
-	autoChooser.AddObject("Drive Forward", driveForwardAuto.get());
+	autoChooser.AddDefault("Drive and Shoot", driveAndShootAuto);
+	autoChooser.AddObject("Drive Forward", driveForwardAuto);
 	frc::SmartDashboard::PutData("Auto Mode", &autoChooser);
 
 	std::cout << __func__ << std::endl;
