@@ -29,8 +29,8 @@
  *
  *     <plugin name="my_piston" filename="libpneumatic_piston.so">
  *       <joint>Joint Name</joint>
- *       <topic>~/pneumatics/1/1</topic>
- *       <reverse-topic>~/pneumatics/1/2</reverse-topic>
+ *       <topic>/gazebo/frc/simulator/pneumatics/1/1</topic>
+ *       <reverse-topic>/gazebo/frc/simulator/pneumatics/1/2</reverse-topic>
  *       <direction>{forward, reversed}</direction>
  *       <forward-force>Number</forward-force>
  *       <reverse-force>Number</reverse-force>
@@ -39,7 +39,7 @@
  * - `joint`: Name of the joint this piston is attached to.
  * - `topic`: Optional. Forward Solenoid signal name. type gazebo.msgs.Bool.
  *            If not given, the name given for the plugin will be used.
- *            To match the simulator, a pattern of ~/pneumatics/1/n is good.
+ *            A pattern of /gazebo/frc/simulator/pneumatics/1/n is good.
  *            The first number represents the PCM module.  Only 1 is supported.
  *            The second number represents the channel on the PCM.
  * - `topic-reverse`: Optional. If given, represents the reverse channel.
