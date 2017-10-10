@@ -11,6 +11,7 @@
 #include "GazeboPCM.h"
 #include "GazeboPWM.h"
 #include "GazeboAnalogIn.h"
+#include "GazeboDIO.h"
 #include "HALSimGazebo.h"
 #include "HAL/Ports.h"
 
@@ -42,6 +43,10 @@ int init(void) {
   int analog_in_count = HAL_GetNumAnalogInputs();
   for (int i = 0; i < analog_in_count; i++)
     halsim.analog_inputs.push_back(new GazeboAnalogIn(i, &halsim));
+
+  int dio_count = HAL_GetNumDigitalChannels();
+  for (int i = 0; i < dio_count; i++)
+    halsim.dios.push_back(new GazeboDIO(i, &halsim));
 
   return 0;
 }
