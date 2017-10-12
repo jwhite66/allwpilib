@@ -50,7 +50,7 @@ model {
         potentiometer(NativeLibrarySpec)
         pneumatic_piston(NativeLibrarySpec)
         rangefinder(NativeLibrarySpec)
-        server(NativeLibrarySpec)
+        servo(NativeLibrarySpec)
         drive_motor(NativeLibrarySpec)
         all { component ->
             sources {
