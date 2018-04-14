@@ -1,0 +1,68 @@
+description = "A simulation that listens on a socket so that you can use the real Driver Station software to connect to the simulation"
+
+apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'visual-studio'
+apply plugin: 'cpp'
+
+ext.cppfrccomm = { binary->
+    binary.tasks.withType(CppCompile) {
+        binary.cppCompiler.args "-I" + project(':ni-libraries').file('include').absolutePath
+    }
+    if (binary.targetPlatform.operatingSystem.windows) {
+        linker.args "ws2_32.lib"
+    }
+}
+
+if (!project.hasProperty('onlyAthena')) {
+    ext.skipAthena = true
+
+    apply from: "../../config.gradle"
+
+
+    model {
+        dependencyConfigs {
+            ntcore(DependencyConfig) {
+                groupId = 'edu.wpi.first.ntcore'
+                artifactId = 'ntcore-cpp'
+                headerClassifier = 'headers'
+                ext = 'zip'
+                version = '4.+'
+                sharedConfigs = [ halsim_ds_socket: [] ]
+            }
+            wpiutil(DependencyConfig) {
+                groupId = 'edu.wpi.first.wpiutil'
+                artifactId = 'wpiutil-cpp'
+                headerClassifier = 'headers'
+                ext = 'zip'
+                version = '3.+'
+                sharedConfigs = [ halsim_ds_socket: [] ]
+            }
+        }
+        components {
+            halsim_ds_socket(NativeLibrarySpec) {
+                sources {
+                    cpp {
+                        source {
+                            srcDirs = [ 'src/main/native/cpp' ]
+                            includes = ["**/*.cpp"]
+                        }
+                        exportedHeaders {
+                            srcDirs = ["src/main/native/include"]
+                        }
+                    }
+                }
+            }
+        }
+
+        binaries {
+            all {
+                project(':hal').addHalToLinker(it)
+                project.cppfrccomm(it)
+            }
+            withType(StaticLibraryBinarySpec) {
+                it.buildable = false
+            }
+        }
+    }
+    apply from: 'publish.gradle'
+}
