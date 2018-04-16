@@ -12,6 +12,7 @@ generatedFileExclude {
   gtest/
   ni-libraries/include/
   ni-libraries/lib/
+  simulation/gz_msgs/src/include/simulation/gz_msgs/msgs.h
 }
 
 modifiableFileExclude {
