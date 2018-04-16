@@ -13,6 +13,7 @@ generatedFileExclude {
   ni-libraries/include/
   ni-libraries/lib/
   simulation/gz_msgs/src/include/simulation/gz_msgs/msgs.h
+  simulation/frc_gazebo_plugins/frcgazebo
 }
 
 modifiableFileExclude {
