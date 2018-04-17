@@ -1,0 +1,126 @@
+#!/bin/bash
+#---------------------------------------------------------------------------
+# Copyright (c) 2018 FIRST. All Rights Reserved.
+# Open Source Software - may be modified and shared by FRC teams. The code
+# must be accompanied by the FIRST BSD license file in the root directory of
+# the project.
+#----------------------------------------------------------------------------
+
+#----------------------------------------------------------------------------
+#  Invoke a given Java sample by creating a temporary Jar file and invoking it.
+#    TODO:  This is a hack, really
+#----------------------------------------------------------------------------
+usage() {
+    echo $1:  Invoke an FRC Java Example
+    echo Usage:
+    echo "  $1 name-of-java-example"
+    echo "Specify 'delete' as the name to force it to be recreated"
+}
+
+d=`dirname "$0"`
+fulldir=`(cd "$d"; pwd)`
+
+if [ -d "$fulldir/../classes" ] ; then
+    classdir=`(cd "$fulldir/../classes"; pwd)`
+else
+    echo Error:  could not find $fulldir/../classes directory
+    exit 1
+fi
+
+if [ -d "$fulldir/../../../hal/build" ] ; then
+    halbuilddir=`(cd "$fulldir/../../../hal/build"; pwd)`
+else
+    echo Error:  could not find $fulldir/../../../../hal/build directory
+    exit 1
+fi
+
+if [ -d "$fulldir/../../../wpilibc/build" ] ; then
+    wpilibcbuilddir=`(cd "$fulldir/../../../wpilibc/build"; pwd)`
+else
+    echo Error:  could not find $fulldir/../../../../wpilibc/build directory
+    exit 1
+fi
+
+if [ -d "$fulldir/../../../wpilibj/build" ] ; then
+    wpilibjbuilddir=`(cd "$fulldir/../../../wpilibj/build"; pwd)`
+else
+    echo Error:  could not find $fulldir/../../../../wpilibj/build directory
+    exit 1
+fi
+
+if [ -d "$fulldir/../../../simulation/halsim_ds_socket/build" ] ; then
+    socketsimdir=`(cd "$fulldir/../../../simulation/halsim_ds_socket/build"; pwd)`
+else
+    echo Error:  could not find $fulldir/../../../simulation/halsim_ds_socket/build directory
+    exit 1
+fi
+
+if [ -d "$fulldir/../../../simulation/halsim_gazebo/build" ] ; then
+    gazebosimdir=`(cd "$fulldir/../../../simulation/halsim_gazebo/build"; pwd)`
+else
+    echo Error:  could not find $fulldir/../../../simulation/halsim_gazebo/build directory
+    exit 1
+fi
+
+if [ -d "$fulldir/../../../build/integrationTestFiles" ] ; then
+    itestdir=`(cd "$fulldir/../../../build/integrationTestFiles"; pwd)`
+else
+    echo Error:  could not find $fulldir/../../../build/integrationTestFiles directory
+    exit 1
+fi
+
+#  Find the name they gave us in the examples tree
+samplename=
+samples=`find $classdir/java/main -type d -iname "$1"`
+for x in $samples; do
+    sampledir=`echo $x | sed "s!^$classdir/java/main/!!"`
+    samplename=`basename $x`
+    break;
+done
+
+if [ "$1" = "delete" ] ; then
+    rm -rf /tmp/sim*.jar
+    exit 0
+fi
+
+if [ $# -lt 1 -o "x${1:0:1}" = "x-" ] ; then
+    usage `basename $0`
+    exit 1
+fi
+
+if [ -z "$samplename" ] ; then
+    echo Error:  Could not find $1 in $classdir/java/main/edu/wpi/first/wpilibj/examples
+    usage `basename $0`
+    exit 2
+fi
+
+jarname=/tmp/sim$samplename.jar
+if [ ! -f "$jarname" ] ; then
+    echo Creating $jarname
+    echo "Robot-Class: edu.wpi.first.wpilibj.examples.$samplename.Robot" > /tmp/manifest
+    cd $classdir/java/main
+    jar cfme $jarname /tmp/manifest edu.wpi.first.wpilibj.RobotBase $sampledir
+
+    rm -rf /tmp/simtempdir
+    mkdir /tmp/simtempdir
+    cd /tmp/simtempdir
+    jar -xf $itestdir/java/wpilibjIntegrationTests-all.jar
+    rm -rf META-INF/*
+    jar uf $jarname .
+else
+    echo Using existing $jarname
+    echo "  Invoke '$0 delete' to erase and prepare to deploy new code"
+fi
+
+l="$wpilibjbuilddir/libs/wpilibJNIShared/shared/x86-64"
+l="$halbuilddir/libs/halSim/shared:$l"
+l="$wpilibcbuilddir/libs/wpilibc/shared/x86-64:$l"
+l="$wpilibcbuilddir/install/wpilibcTestingBaseTest/lib:$l"
+export LD_LIBRARY_PATH="$l:$LD_LIBRARY_PATH"
+
+export HALSIM_EXTENSIONS="$socketsimdir/libs/halsim_ds_socket/shared/libhalsim_ds_socket.so":$HALSIM_EXTENSIONS
+export HALSIM_EXTENSIONS="$gazebosimdir/libs/halsim_gazebo/shared/libhalsim_gazebo.so":$HALSIM_EXTENSIONS
+
+echo "Running $samplename"
+java -jar $jarname
+
