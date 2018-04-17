@@ -1,0 +1,92 @@
+#!/bin/bash
+#---------------------------------------------------------------------------
+# Copyright (c) 2018 FIRST. All Rights Reserved.
+# Open Source Software - may be modified and shared by FRC teams. The code
+# must be accompanied by the FIRST BSD license file in the root directory of
+# the project.
+#----------------------------------------------------------------------------
+
+#----------------------------------------------------------------------------
+#  Invoke a given sample, giving it the LD_LIBRARY_PATH
+#    and extensions we crave.
+#----------------------------------------------------------------------------
+usage() {
+    echo $1:  Invoke an FRC CPP Example
+    echo Usage:
+    echo "  $1 name-of-cpp-example"
+}
+
+d=`dirname "$0"`
+fulldir=`(cd "$d"; pwd)`
+
+if [ -d "$fulldir/../exe" ] ; then
+    exedir=`(cd "$fulldir/../exe"; pwd)`
+else
+    echo Error:  could not find $fulldir/../exe directory
+    exit 1
+fi
+
+if [ -d "$fulldir/../../../hal/build" ] ; then
+    halbuilddir=`(cd "$fulldir/../../../hal/build"; pwd)`
+else
+    echo Error:  could not find $fulldir/../../../../hal/build directory
+    exit 1
+fi
+
+if [ -d "$fulldir/../../../wpilibc/build" ] ; then
+    wpilibcbuilddir=`(cd "$fulldir/../../../wpilibc/build"; pwd)`
+else
+    echo Error:  could not find $fulldir/../../../../wpilibc/build directory
+    exit 1
+fi
+
+if [ -d "$fulldir/../../../simulation/halsim_ds_socket/build" ] ; then
+    simdir=`(cd "$fulldir/../../../simulation"; pwd)`
+else
+    echo Error:  could not find $fulldir/../../../simulation/halsim_ds_socket/build directory
+    exit 1
+fi
+
+
+
+#  Use exactly the file they gave us, or find it in ../exe
+exe="$1"
+if [ ! -x "$exe" ] ; then
+    exes=`find $exedir -type f -iname "$1"`
+    for x in $exes; do
+        echo $x | grep -q athena
+        if [ $? -ne 0 ] ; then
+            exe="$x"
+            break;
+        fi
+    done
+fi
+
+if [ $# -lt 1 -o "x${1:0:1}" = "x-" ] ; then
+    usage `basename $0`
+    exit 1
+fi
+
+if [ ! -x "$exe" ] ; then
+    echo Error:  Could not find $1 or $exedir/$1/x86-64/$1
+    exit 2
+fi
+
+export LD_LIBRARY_PATH="$halbuilddir/libs/halSim/shared:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$wpilibcbuilddir/libs/wpilibc/shared/x86-64:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$wpilibcbuilddir/install/wpilibcTestingBaseTest/lib:$LD_LIBRARY_PATH"
+
+export HALSIM_EXTENSIONS="$simdir/halsim_ds_socket/build/libs/halsim_ds_socket/shared/libhalsim_ds_socket.so":$HALSIM_EXTENSIONS
+export HALSIM_EXTENSIONS="$simdir/halsim_gazebo/build/libs/halsim_gazebo/shared/libhalsim_gazebo.so":$HALSIM_EXTENSIONS
+
+#export GAZEBO_MODEL_PATH="$sharedir/models":$GAZEBO_MODEL_PATH
+#for x in `find "$libsdir" -type d -name shared` ; do
+#    export GAZEBO_PLUGIN_PATH="$x:$GAZEBO_PLUGIN_PATH"
+#done
+#
+#gazebo "$world"
+if [ "$2" = "gdb" ] ; then
+    gdb "$exe"
+else
+    $exe
+fi

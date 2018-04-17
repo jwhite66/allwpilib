@@ -69,12 +69,10 @@ if (!project.hasProperty('skipAthena')) {
             examplesMap.each { key, value->
                 "${key}"(NativeExecutableSpec) {
                     binaries.all { binary->
+                        project(':hal').addHalToLinker(binary)
+                        project(':wpilibc').addWpilibCToLinker(binary)
                         if (binary.targetPlatform.architecture.name == 'athena') {
                             project(':ni-libraries').addNiLibrariesToLinker(binary)
-                            project(':hal').addHalToLinker(binary)
-                            project(':wpilibc').addWpilibCToLinker(binary)
-                        } else {
-                            binary.buildable = false
                         }
                     }
                     sources {
@@ -112,3 +110,11 @@ if (!project.hasProperty('skipAthena')) {
     }
     apply from: 'publish.gradle'
 }
+
+task copyScript(type: Copy, group: "Run CPP Example", description: "Copy the runcppexample script to the output directory.") {
+    from "scripts"
+    into "$project.buildDir/bin"
+    fileMode 0755
+}
+
+build.dependsOn copyScript
