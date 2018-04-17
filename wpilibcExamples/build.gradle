@@ -204,3 +204,10 @@ ext {
 }
 
 apply from: "${rootDir}/shared/examplecheck.gradle"
+task copyScript(type: Copy, group: "Run CPP Example", description: "Copy the runcppexample script to the output directory.") {
+    from "scripts"
+    into "$project.buildDir/bin"
+    fileMode 0755
+}
+
+build.dependsOn copyScript
