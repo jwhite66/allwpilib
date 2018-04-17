@@ -16,6 +16,8 @@ generatedFileExclude {
   hal/src/main/native/athena/frccansae/
   hal/src/main/native/athena/visa/
   hal/src/main/native/include/ctre/
+  simulation/gz_msgs/src/include/simulation/gz_msgs/msgs.h
+  simulation/frc_gazebo_plugins/frcgazebo
   UsageReporting\.h$
 }
 
