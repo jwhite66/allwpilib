@@ -20,10 +20,11 @@ public:
 private:
 	frc::Joystick m_joystick{0};
 
-	frc::JoystickButton m_l1{&m_joystick, 11};
-	frc::JoystickButton m_l2{&m_joystick, 9};
-	frc::JoystickButton m_r1{&m_joystick, 12};
-	frc::JoystickButton m_r2{&m_joystick, 10};
+        /* jwhite@codeweavers.com - switch button mapping to work with a Logitech */
+	frc::JoystickButton m_l1{&m_joystick, /*11*/ 5};
+	frc::JoystickButton m_l2{&m_joystick, /*9*/  7};
+	frc::JoystickButton m_r1{&m_joystick, /*12*/ 6};
+	frc::JoystickButton m_r2{&m_joystick, /*10*/ 8};
 
-	DoubleButton m_sticks{&m_joystick, 2, 3};
+	DoubleButton m_sticks{&m_joystick, /*2, 3*/ 11, 12};
 };
