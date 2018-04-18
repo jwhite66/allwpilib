@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# This is an utter hack to run the PacGoat Java code
+export LD_LIBRARY_PATH=/home/jwhite/w/allwpilib/wpilibj/build/libs/wpilibJNIShared/shared/x86-64:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/home/jwhite/w/allwpilib/hal/build/install/halSimTestingBaseTest/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/home/jwhite/w/allwpilib/wpilibc/build/install/wpilibcTestingBaseTest/lib/:$LD_LIBRARY_PATH
+#java -DRobot-Class=fred -cp ./wpilibj/build/libs/wpilibj.jar edu.wpi.first.wpilibj.RobotBase
+#export CLASSPATH=./build/integrationTestFiles/java/wpilibjIntegrationTests-all.jar:$CLASSPATH
+#java \
+#  -DRobot-Class=edu.wpi.first.wpilibj.examples.pacgoat.Robot \
+#  edu.wpi.first.wpilibj.RobotBase
+
+if [ -d "simulation/halsim_ds_socket/build" ] ; then
+    simdir=`(cd "simulation"; pwd)`
+else
+    echo Error:  could not find simulation/halsim_ds_socket/build directory
+    exit 1
+fi
+
+if [ ! -f /tmp/goat.jar ] ; then
+    rm -rf /tmp/jar /tmp/goat.jar
+    mkdir /tmp/jar
+    pushd /tmp/jar
+    unzip -o /home/jwhite/w/allwpilib/build/integrationTestFiles/java/wpilibjIntegrationTests-all.jar
+    rm -rf META-INF
+    popd
+    echo Robot-Class: edu.wpi.first.wpilibj.examples.pacgoat.Robot > /tmp/manifest
+    pushd wpilibjExamples/build/classes/java/main
+    jar cfem /tmp/goat.jar edu.wpi.first.wpilibj.RobotBase /tmp/manifest edu/wpi/first/wpilibj/examples/pacgoat/
+    popd
+    pushd /tmp/jar
+    jar uf /tmp/goat.jar .
+    popd
+fi
+
+export HALSIM_EXTENSIONS="$simdir/halsim_ds_socket/build/libs/halsim_ds_socket/shared/libhalsim_ds_socket.so":$HALSIM_EXTENSIONS
+export HALSIM_EXTENSIONS="$simdir/halsim_gazebo/build/libs/halsim_gazebo/shared/libhalsim_gazebo.so":$HALSIM_EXTENSIONS
+
+java -jar /tmp/goat.jar
