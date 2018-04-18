@@ -38,7 +38,7 @@ public class DriveTrain extends Subsystem {
 	private DifferentialDrive m_drive;
 	private Encoder m_rightEncoder = new Encoder(1, 2, true, EncodingType.k4X);
 	private Encoder m_leftEncoder = new Encoder(3, 4, false, EncodingType.k4X);
-	private AnalogGyro m_gyro = new AnalogGyro(2);
+	private AnalogGyro m_gyro = new AnalogGyro(0);
 
 	public DriveTrain() {
 		// Configure drive motors
