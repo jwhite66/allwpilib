@@ -69,12 +69,10 @@ if (!project.hasProperty('skipAthena')) {
             examplesMap.each { key, value->
                 "${key}"(NativeExecutableSpec) {
                     binaries.all { binary->
+                        project(':hal').addHalToLinker(binary)
+                        project(':wpilibc').addWpilibCToLinker(binary)
                         if (binary.targetPlatform.architecture.name == 'athena') {
                             project(':ni-libraries').addNiLibrariesToLinker(binary)
-                            project(':hal').addHalToLinker(binary)
-                            project(':wpilibc').addWpilibCToLinker(binary)
-                        } else {
-                            binary.buildable = false
                         }
                     }
                     sources {
