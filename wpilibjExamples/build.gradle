@@ -27,4 +27,11 @@ gradle.projectsEvaluated {
     }
 }
 
+task copyScript(type: Copy, group: "Run Java Example", description: "Copy the runjavaxample script to the output directory.") {
+    from "scripts"
+    into "$project.buildDir/bin"
+    fileMode 0755
+}
+
+build.dependsOn copyScript
 apply from: 'publish.gradle'
