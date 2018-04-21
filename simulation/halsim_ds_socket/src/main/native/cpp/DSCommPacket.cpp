@@ -117,7 +117,6 @@ int DSCommPacket::DecodeTCP(uint8_t* packet, int len) {
       m_joystick_types[joystick] = static_cast<int>(packet[5]);
       int namelen =  static_cast<int>(packet[6]);
       m_joystick_names[joystick] = std::string(reinterpret_cast<char *>(packet + 7), namelen);
-      std::cerr << namelen << ": " << m_joystick_names[joystick].c_str() << std::endl;
     }
   } else {
     std::cerr << "TCP packet type " << packet_type << " unimplemented" << std::endl;
