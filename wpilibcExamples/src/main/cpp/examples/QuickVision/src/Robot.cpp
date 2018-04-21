@@ -7,6 +7,7 @@
 
 #include <CameraServer.h>
 #include <IterativeRobot.h>
+#include <iostream>
 
 /**
  * Uses the CameraServer class to automatically capture video from a USB webcam
@@ -18,7 +19,11 @@
 class Robot : public frc::IterativeRobot {
 public:
 	void RobotInit() {
+#if defined(__linux__)
 		CameraServer::GetInstance()->StartAutomaticCapture();
+#else
+                std::cerr << "Vision only available on Linux." << std::endl;
+#endif
 	}
 };
 
