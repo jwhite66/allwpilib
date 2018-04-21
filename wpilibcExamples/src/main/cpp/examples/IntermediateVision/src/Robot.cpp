@@ -5,6 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <iostream>
 #include <thread>
 
 #include <CameraServer.h>
@@ -21,6 +22,7 @@
  * processing.
  */
 class Robot : public frc::IterativeRobot {
+#if defined(__linux__)
 private:
 	static void VisionThread() {
 		// Get the USB camera from CameraServer
@@ -58,12 +60,17 @@ private:
 			outputStream.PutFrame(mat);
 		}
 	}
+#endif
 
 	void RobotInit() {
 		// We need to run our vision program in a separate Thread.
 		// If not, our robot program will not run
+#if defined(__linux__)
 		std::thread visionThread(VisionThread);
 		visionThread.detach();
+#else
+                std::cerr << "Vision only available on Linux." << std::endl;
+#endif
 	}
 };
 

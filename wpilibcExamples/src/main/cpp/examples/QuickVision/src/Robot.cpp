@@ -5,6 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <iostream>
+
 #include <CameraServer.h>
 #include <IterativeRobot.h>
 
@@ -18,7 +20,11 @@
 class Robot : public frc::IterativeRobot {
 public:
 	void RobotInit() {
+#if defined(__linux__)
 		CameraServer::GetInstance()->StartAutomaticCapture();
+#else
+                std::cerr << "Vision only available on Linux." << std::endl;
+#endif
 	}
 };
 
