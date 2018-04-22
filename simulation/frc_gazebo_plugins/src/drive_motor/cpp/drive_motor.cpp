@@ -101,7 +101,11 @@ static double computeForce(double input, double velocity, double max) {
 }
 
 void DriveMotor::Update(const gazebo::common::UpdateInfo& info) {
+#if GAZEBO_MAJOR_VERSION >= 8
   ignition::math::Vector3d velocity = parent->RelativeLinearVel();
+#else
+  ignition::math::Vector3d velocity = parent->GetRelativeLinearVel().Ign();
+#endif
 
   if (signal == 0)
     return;
@@ -114,7 +118,11 @@ void DriveMotor::Update(const gazebo::common::UpdateInfo& info) {
                           std::fabs(maxSpeed * dz));
 
   ignition::math::Vector3d force(x, y, z);
+#if GAZEBO_MAJOR_VERSION >= 8
   parent->AddLinkForce(force, child->RelativePose().Pos());
+#else
+  parent->AddLinkForce(force, child->GetRelativePose().Ign().Pos());
+#endif
 }
 
 void DriveMotor::Callback(const gazebo::msgs::ConstFloat64Ptr& msg) {
