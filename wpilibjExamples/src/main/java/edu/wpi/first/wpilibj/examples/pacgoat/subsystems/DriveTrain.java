@@ -95,7 +95,9 @@ public class DriveTrain extends Subsystem {
    * @param joy PS3 style joystick to use as the input for tank drive.
    */
   public void tankDrive(Joystick joy) {
-    m_drive.tankDrive(joy.getY(), joy.getRawAxis(4));
+    // jwhite@codeweavers.com - shifting to use Logitech joystick
+    //m_drive.tankDrive(joy.getY(), joy.getRawAxis(4));
+    m_drive.tankDrive(joy.getRawAxis(1), -joy.getRawAxis(3));
   }
 
   /**
