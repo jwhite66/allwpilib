@@ -14,7 +14,9 @@ DriveWithJoystick::DriveWithJoystick() { Requires(&Robot::drivetrain); }
 // Called repeatedly when this Command is scheduled to run
 void DriveWithJoystick::Execute() {
   auto& joystick = Robot::oi.GetJoystick();
-  Robot::drivetrain.TankDrive(joystick.GetY(), joystick.GetRawAxis(4));
+  // jwhite@codeweavers.com - shifting to use Logitech joystick
+  // Robot::drivetrain.TankDrive(joystick.GetY(), joystick.GetRawAxis(4));
+  Robot::drivetrain.TankDrive(joystick.GetRawAxis(1), joystick.GetRawAxis(3));
 }
 
 // Make this return true when this Command no longer needs to run execute()

@@ -33,15 +33,15 @@ public class OI {
    * Create a new OI and all of the buttons on it.
    */
   public OI() {
-    new JoystickButton(m_joystick, 12).whenPressed(new LowGoal());
-    new JoystickButton(m_joystick, 10).whenPressed(new Collect());
+    new JoystickButton(m_joystick, /*12*/ 5).whenPressed(new LowGoal());
+    new JoystickButton(m_joystick, /*10*/ 7).whenPressed(new Collect());
 
-    new JoystickButton(m_joystick, 11).whenPressed(
+    new JoystickButton(m_joystick, /*11*/ 6).whenPressed(
         new SetPivotSetpoint(Pivot.kShoot));
-    new JoystickButton(m_joystick, 9).whenPressed(
+    new JoystickButton(m_joystick, /*9*/  8).whenPressed(
         new SetPivotSetpoint(Pivot.kShootNear));
 
-    new DoubleButton(m_joystick, 2, 3).whenActive(new Shoot());
+    new DoubleButton(m_joystick, /*2, 3*/ 11, 12).whenActive(new Shoot());
 
     // SmartDashboard Buttons
     SmartDashboard.putData("Drive Forward", new DriveForward(2.25));
