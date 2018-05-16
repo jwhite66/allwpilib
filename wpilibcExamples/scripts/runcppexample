@@ -75,6 +75,7 @@ fi
 export LD_LIBRARY_PATH="$halbuilddir/libs/halSim/shared:$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH="$wpilibcbuilddir/libs/wpilibc/shared/x86-64:$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH="$wpilibcbuilddir/install/wpilibcTestingBaseTest/lib:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$wpilibcbuilddir/install/wpilibcTest/x86-64/lib:$LD_LIBRARY_PATH"
 
 export HALSIM_EXTENSIONS="$simdir/halsim_ds_socket/build/libs/halsim_ds_socket/shared/libhalsim_ds_socket.so":$HALSIM_EXTENSIONS
 export HALSIM_EXTENSIONS="$simdir/halsim_gazebo/build/libs/halsim_gazebo/shared/libhalsim_gazebo.so":$HALSIM_EXTENSIONS

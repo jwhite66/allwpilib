@@ -49,12 +49,6 @@ model {
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     project(':ni-libraries').addNiLibrariesToLinker(binary)
-                    if (binary.targetPlatform.architecture.name != 'athena') {
-                        lib project: ':simulation:halsim_lowfi', library: 'halsim_lowfi', linkage: 'shared'
-                        lib project: ':simulation:halsim_adx_gyro_accelerometer', library: 'halsim_adx_gyro_accelerometer', linkage: 'shared'
-                        lib project: ':simulation:halsim_print', library: 'halsim_print', linkage: 'shared'
-                        lib project: ':simulation:halsim_ds_nt', library: 'halsim_ds_nt', linkage: 'shared'
-                    }
                 }
                 sources {
                     cpp {
@@ -81,12 +75,6 @@ model {
                         }
                     }
                     project(':ni-libraries').addNiLibrariesToLinker(binary)
-                    if (binary.targetPlatform.architecture.name != 'athena') {
-                        lib project: ':simulation:halsim_lowfi', library: 'halsim_lowfi', linkage: 'shared'
-                        lib project: ':simulation:halsim_adx_gyro_accelerometer', library: 'halsim_adx_gyro_accelerometer', linkage: 'shared'
-                        lib project: ':simulation:halsim_print', library: 'halsim_print', linkage: 'shared'
-                        lib project: ':simulation:halsim_ds_nt', library: 'halsim_ds_nt', linkage: 'shared'
-                    }
                 }
                 sources {
                     cpp {
